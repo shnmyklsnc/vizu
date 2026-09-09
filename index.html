@@ -1,0 +1,13 @@
+---
+layout: default
+---
+<div class="grid">
+  {% assign sketches = site.sketches | sort: "date" | reverse %}
+  {% for sketch in sketches %}
+  <a class="card" href="{{ sketch.url | relative_url }}">
+    <img src="{{ sketch.thumbnail | relative_url }}" alt="{{ sketch.title }}" loading="lazy">
+    <h3>{{ sketch.title }}</h3>
+    <p>{{ sketch.description }}</p>
+  </a>
+  {% endfor %}
+</div>
