@@ -1,17 +1,13 @@
 title: My Sketchbook
 description: A gallery of generative animations and visualizations, built with p5.js.
-baseurl: ""   # set to "/your-repo-name" if this is a project page (not <user>.github.io)
-url: ""       # e.g. "https://yourusername.github.io"
+baseurl: "/vizu"   
+url: "https://shnmyklsnc.github.io"       
 
-# Treat everything in _sketches/ as a collection of pages, one per sketch,
-# each rendered at /sketches/<name>/
 collections:
   sketches:
     output: true
     permalink: /sketches/:name/
 
-# Every file in the sketches collection uses the "sketch" layout unless it
-# says otherwise in its own front matter.
 defaults:
   - scope:
       path: ""
