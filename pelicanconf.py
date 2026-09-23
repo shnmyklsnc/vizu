@@ -1,6 +1,6 @@
 AUTHOR = "Shan"
-SITENAME = "My Sketchbook"
-SITESUBTITLE = "A gallery of generative animations and visualizations, built with p5.js."
+SITENAME = "Vizu"
+SITESUBTITLE = "A gallery of generative animations and visualizations"
 SITEURL = ""
 
 PATH = "content"
