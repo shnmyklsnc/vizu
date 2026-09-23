@@ -8,13 +8,15 @@
   <p class="meta">{{ article.locale_date }}{% if article.tags %} · {{ article.tags|join(", ") }}{% endif %}</p>
 
   <div id="sketch-holder"></div>
+  <div id="controls-holder" class="panel"></div>
 
   <div class="description">
     {{ article.content }}
   </div>
 </article>
 
-<!-- p5.js from a CDN, then this sketch's own code -->
+<!-- p5.js from a CDN, then the shared control-panel helper, then this sketch's own code -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="{{ SITEURL }}/extra/js/panel.js"></script>
 <script src="{{ SITEURL }}/{{ article.script }}"></script>
 {% endblock %}

@@ -114,6 +114,102 @@ main {
   color: var(--muted);
 }
 
+/* --- tweak panel (sample-value controls under a sketch) --- */
+
+.panel {
+  max-width: 620px;
+  margin: 0 auto 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--card-bg);
+  border-radius: 10px;
+}
+
+.panel:empty {
+  display: none;
+}
+
+.panel .panel-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.panel .panel-row:last-child {
+  margin-bottom: 0;
+}
+
+.panel .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.panel .field.grow {
+  flex: 1 1 160px;
+}
+
+.panel label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.panel input[type="text"],
+.panel select {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid #2a2a33;
+  border-radius: 6px;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.panel input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.panel button {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.panel button:hover {
+  background: var(--accent);
+  color: #0b0b0f;
+}
+
+.panel button:disabled {
+  opacity: 0.4;
+  cursor: default;
+  background: transparent;
+  color: var(--accent);
+}
+
+.panel .status-line {
+  font-size: 0.85rem;
+  color: var(--fg);
+  min-height: 1.2em;
+  border-top: 1px solid #2a2a33;
+  padding-top: 0.6rem;
+  margin-top: 0.15rem;
+}
+
+.panel .hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
 footer {
   text-align: center;
   color: var(--muted);
