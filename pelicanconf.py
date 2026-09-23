@@ -1,3 +1,5 @@
+import json
+
 AUTHOR = "Shan"
 SITENAME = "Vizu"
 SITESUBTITLE = "A gallery of generative animations and visualizations"
@@ -37,6 +39,16 @@ CATEGORIES_SAVE_AS = ""
 AUTHOR_SAVE_AS = ""
 AUTHORS_SAVE_AS = ""
 ARCHIVES_SAVE_AS = ""
+
+# We don't generate separate category/tag archive pages (no template styled
+# for them) -- category and tag browsing instead happens client-side on the
+# homepage (see theme/templates/base.html + extra/js/nav.js), reading the
+# `categories` / `tags` / `articles` context Pelican already builds.
+DEFAULT_CATEGORY = "Misc"
+
+# Lets templates safely embed Python values as JSON (used to build the
+# in-page search index -- see the #search-data block in base.html).
+JINJA_FILTERS = {"tojson": json.dumps}
 
 DEFAULT_METADATA = {
     "status": "published",

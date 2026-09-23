@@ -33,6 +33,139 @@ header {
   margin-top: 0.25rem;
 }
 
+/* --- site nav: search + category pills --- */
+
+.site-nav {
+  max-width: 640px;
+  margin: 1.5rem auto 0;
+  text-align: left;
+}
+
+.search-wrap {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+#site-search {
+  width: 100%;
+  background: var(--card-bg);
+  color: var(--fg);
+  border: 1px solid #2a2a33;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+#site-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.search-results {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid #2a2a33;
+  border-radius: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.search-hit {
+  display: block;
+  padding: 0.6rem 0.85rem;
+  text-decoration: none;
+  color: var(--fg);
+  border-bottom: 1px solid #202027;
+}
+
+.search-hit:last-child {
+  border-bottom: none;
+}
+
+.search-hit:hover {
+  background: var(--bg);
+}
+
+.search-hit-title {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.search-hit-meta {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+
+.search-empty {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.category-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #2a2a33;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.pill:hover {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+
+.pill.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(125, 211, 252, 0.08);
+}
+
+.pill-count {
+  color: inherit;
+  opacity: 0.65;
+  font-size: 0.75rem;
+}
+
+.filter-status {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.filter-status a {
+  color: var(--accent);
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+#empty-state {
+  text-align: center;
+  padding: 2rem 0;
+}
+
 main {
   max-width: 1100px;
   margin: 0 auto;
@@ -48,17 +181,20 @@ main {
 }
 
 .card {
-  display: block;
   background: var(--card-bg);
   border-radius: 10px;
   overflow: hidden;
-  text-decoration: none;
-  color: var(--fg);
   transition: transform 0.15s ease;
 }
 
 .card:hover {
   transform: translateY(-3px);
+}
+
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: var(--fg);
 }
 
 .card img {
@@ -79,6 +215,30 @@ main {
   font-size: 0.9rem;
 }
 
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 1rem 1rem;
+}
+
+.tag-chip {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid #2a2a33;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.tag-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* --- individual sketch page --- */
 
 .sketch-page .back-link {
@@ -95,6 +255,19 @@ main {
   color: var(--muted);
   font-size: 0.85rem;
   margin-bottom: 1.5rem;
+}
+
+.sketch-page .meta .tag-chip {
+  margin-right: 0.3rem;
+}
+
+.category-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.category-link:hover {
+  text-decoration: underline;
 }
 
 #sketch-holder {

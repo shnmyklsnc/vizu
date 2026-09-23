@@ -1,4 +1,5 @@
 Title: Dutch National Flag
+Category: Algorithms
 Date: 2024-03-15
 Summary: Three-way partitioning of an array into 0s, 1s and 2s in one pass.
 Tags: algorithms, sorting, partitioning

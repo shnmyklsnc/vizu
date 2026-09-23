@@ -1,4 +1,5 @@
 Title: Closest Pair of Points
+Category: Algorithms
 Date: 2024-03-10
 Summary: Divide-and-conquer search for the two nearest points, in 1D, 2D or 3D.
 Tags: algorithms, divide-and-conquer, geometry

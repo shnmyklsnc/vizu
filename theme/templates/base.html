@@ -11,6 +11,20 @@
   <header>
     <a class="site-title" href="{{ SITEURL }}/">{{ SITENAME }}</a>
     <p class="tagline">{{ SITESUBTITLE }}</p>
+
+    <nav class="site-nav">
+      <div class="search-wrap">
+        <input type="search" id="site-search" placeholder="Search sketches&hellip;" autocomplete="off" aria-label="Search sketches">
+        <div id="search-results" class="search-results" hidden></div>
+      </div>
+      <div class="category-pills" id="category-pills">
+        <a href="{{ SITEURL }}/" data-category="" class="pill pill-all">All</a>
+        {% for cat, cat_articles in categories|sort(attribute="0.name") %}
+        <a href="{{ SITEURL }}/?category={{ cat.slug }}" data-category="{{ cat.slug }}" class="pill">{{ cat.name }} <span class="pill-count">{{ cat_articles|length }}</span></a>
+        {% endfor %}
+      </div>
+      <div id="filter-status" class="filter-status" hidden></div>
+    </nav>
   </header>
   <main>
     {% block content %}{% endblock %}
@@ -18,5 +32,15 @@
   <footer>
     <p>Built with <a href="https://p5js.org">p5.js</a> and <a href="https://getpelican.com">Pelican</a>.</p>
   </footer>
+
+  <!-- Search index for the nav search box: title/summary/category/tags for
+       every sketch, embedded so search works with no extra network request. -->
+  <script id="search-data" type="application/json">
+[
+{% for article in articles %}{{ {"title": article.title, "url": (SITEURL ~ "/" ~ article.url), "summary": article.summary|striptags, "category": article.category.name, "categorySlug": article.category.slug, "tags": article.tags|map(attribute="name")|list, "tagSlugs": article.tags|map(attribute="slug")|list}|tojson }}{% if not loop.last %},{% endif %}
+{% endfor %}
+]
+  </script>
+  <script src="{{ SITEURL }}/extra/js/nav.js"></script>
 </body>
 </html>

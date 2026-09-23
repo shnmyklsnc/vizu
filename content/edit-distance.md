@@ -1,4 +1,5 @@
 Title: Edit Distance (Levenshtein)
+Category: Algorithms
 Date: 2024-03-25
 Summary: The DP table for the minimum insert, delete and substitute edits between two words.
 Tags: algorithms, dynamic-programming, strings

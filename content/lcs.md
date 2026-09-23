@@ -1,4 +1,5 @@
 Title: Longest Common Subsequence
+Category: Algorithms
 Date: 2024-03-20
 Summary: Filling a DP table to find the longest subsequence shared by two strings.
 Tags: algorithms, dynamic-programming, strings

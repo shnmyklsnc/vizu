@@ -5,7 +5,14 @@
 <article class="sketch-page">
   <a class="back-link" href="{{ SITEURL }}/">&larr; All sketches</a>
   <h1>{{ article.title }}</h1>
-  <p class="meta">{{ article.locale_date }}{% if article.tags %} · {{ article.tags|join(", ") }}{% endif %}</p>
+  <p class="meta">
+    {{ article.locale_date }} &middot;
+    <a class="category-link" href="{{ SITEURL }}/?category={{ article.category.slug }}">{{ article.category.name }}</a>
+    {% if article.tags %}
+    &middot;
+    {% for tag in article.tags %}<a class="tag-chip" href="{{ SITEURL }}/?tag={{ tag.slug }}">{{ tag.name }}</a>{% if not loop.last %} {% endif %}{% endfor %}
+    {% endif %}
+  </p>
 
   <div id="sketch-holder"></div>
   <div id="controls-holder" class="panel"></div>
