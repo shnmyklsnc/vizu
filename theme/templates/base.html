@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
   <meta name="description" content="{% block description %}{{ SITESUBTITLE }}{% endblock %}">
+  <!-- Applied before first paint so the page never flashes the wrong theme:
+       reads the saved choice (or the OS preference on a first visit) and
+       sets it on <html> before the stylesheet below is even parsed. -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("vizu-theme");
+        var theme = stored || ((window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="{{ SITEURL }}/extra/css/style.css">
 </head>
 <body>
@@ -15,6 +27,7 @@
     <nav class="site-nav">
       <div class="search-wrap">
         <input type="search" id="site-search" placeholder="Search sketches&hellip;" autocomplete="off" aria-label="Search sketches">
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle color theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></button>
         <div id="search-results" class="search-results" hidden></div>
       </div>
       <div class="category-pills" id="category-pills">

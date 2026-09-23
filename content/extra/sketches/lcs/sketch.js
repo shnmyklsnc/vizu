@@ -7,6 +7,10 @@
 
 let str1 = "malina";
 let str2 = "manila";
+let maxWordLen = 10;
+
+let highlightColor = [255, 165, 0];
+let pathColor = [120, 220, 140];
 
 let dpValues = [];
 let lcsPath = new Set();
@@ -21,6 +25,7 @@ let originX = 0;
 let originY = 0;
 
 let playBtn, statusEl, inputA, inputB;
+let theme = null; // refreshed every frame in draw() -- see themePalette() in panel.js
 
 function* solveGen() {
   const w = str1.length;
@@ -111,18 +116,19 @@ function togglePlay() {
 }
 
 function sanitizeWord(text, fallback) {
-  const cleaned = text.replace(/[^A-Za-z0-9]/g, "").slice(0, 10);
+  const cleaned = text.replace(/[^A-Za-z0-9]/g, "").slice(0, maxWordLen);
   return cleaned.length > 0 ? cleaned : fallback;
 }
 
 function buildPanel() {
   const holder = document.getElementById("controls-holder");
 
+  panelHeading(holder, "Data");
   const row1 = panelRow(holder);
   inputA = panelTextInput(row1, {
     label: "String A",
     value: str1,
-    maxLength: 10,
+    maxLength: maxWordLen,
     onChange: (text) => {
       str1 = sanitizeWord(text, str1);
       inputA.value = str1;
@@ -132,7 +138,7 @@ function buildPanel() {
   inputB = panelTextInput(row1, {
     label: "String B",
     value: str2,
-    maxLength: 10,
+    maxLength: maxWordLen,
     onChange: (text) => {
       str2 = sanitizeWord(text, str2);
       inputB.value = str2;
@@ -141,17 +147,68 @@ function buildPanel() {
   });
 
   const row2 = panelRow(holder);
-  playBtn = panelButton(row2, "Play", togglePlay);
-  panelButton(row2, "Step", () => {
+  panelSlider(row2, {
+    label: "Max length",
+    min: 4,
+    max: 12,
+    value: maxWordLen,
+    grow: true,
+    format: (v) => `${v} chars`,
+    onInput: (v) => {
+      maxWordLen = v;
+      inputA.maxLength = maxWordLen;
+      inputB.maxLength = maxWordLen;
+      str1 = sanitizeWord(str1, "a");
+      str2 = sanitizeWord(str2, "a");
+      inputA.value = str1;
+      inputB.value = str2;
+      resetState();
+    },
+  });
+
+  panelHeading(holder, "Playback");
+  const row3 = panelRow(holder);
+  panelSlider(row3, {
+    label: "Speed",
+    min: 1,
+    max: 10,
+    value: 8,
+    grow: true,
+    onInput: (v) => {
+      stepInterval = Math.round(20 - v * 1.8);
+    },
+  });
+
+  panelHeading(holder, "Appearance");
+  const row4 = panelRow(holder);
+  panelColor(row4, {
+    label: "Highlight color",
+    value: highlightColor,
+    onChange: (rgb) => {
+      highlightColor = rgb;
+    },
+  });
+  panelColor(row4, {
+    label: "Path color",
+    value: pathColor,
+    onChange: (rgb) => {
+      pathColor = rgb;
+    },
+  });
+
+  const row5 = panelRow(holder);
+  row5.classList.add("buttons");
+  playBtn = panelButton(row5, "Play", togglePlay);
+  panelButton(row5, "Step", () => {
     playing = false;
     playBtn.textContent = "Play";
     stepOnce();
   });
-  panelButton(row2, "Restart", resetState);
+  panelButton(row5, "Restart", resetState);
 
   const hint = document.createElement("div");
   hint.className = "hint";
-  hint.textContent = "Letters only, up to 10 characters each.";
+  hint.textContent = "Letters and digits only.";
   holder.appendChild(hint);
 
   statusEl = panelStatusLine(holder);
@@ -165,7 +222,8 @@ function setup() {
 }
 
 function draw() {
-  background(15, 15, 20);
+  theme = themePalette();
+  background(theme.canvasBg[0], theme.canvasBg[1], theme.canvasBg[2]);
 
   if (playing && frameCount % stepInterval === 0) {
     stepOnce();
@@ -208,26 +266,37 @@ function drawGrid() {
   }
 }
 
+// The highlight color is user-tweakable, so pick dark or light label text
+// by perceived luminance instead of assuming it stays a pale orange.
+function readableTextColor(rgb) {
+  const luma = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+  return luma > 150 ? 30 : 250;
+}
+
 function drawCell(col, row, label, highlighted, onPath) {
   const x = originX + col * cellSize;
   const y = originY + row * cellSize;
 
   if (onPath) {
-    stroke(120, 220, 140);
+    stroke(pathColor[0], pathColor[1], pathColor[2]);
     strokeWeight(3);
-    fill(30, 55, 38);
+    fill(pathColor[0] * 0.25, pathColor[1] * 0.25, pathColor[2] * 0.25);
   } else if (highlighted) {
-    stroke(255, 165, 0);
+    stroke(highlightColor[0], highlightColor[1], highlightColor[2]);
     strokeWeight(3);
-    fill(255, 165, 0);
+    fill(highlightColor[0], highlightColor[1], highlightColor[2]);
   } else {
-    stroke(70, 70, 80);
+    stroke(theme.cellBorder[0], theme.cellBorder[1], theme.cellBorder[2]);
     strokeWeight(1);
-    fill(22, 22, 28);
+    fill(theme.cellBg[0], theme.cellBg[1], theme.cellBg[2]);
   }
   rect(x, y, cellSize, cellSize, 3);
 
   noStroke();
-  fill(highlighted ? 30 : 225);
+  if (highlighted) {
+    fill(readableTextColor(highlightColor));
+  } else {
+    fill(theme.text[0], theme.text[1], theme.text[2]);
+  }
   text(label, x, y);
 }

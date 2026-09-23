@@ -145,7 +145,123 @@ function setupFilters() {
   applyFilter(params.get("category") || "", params.get("tag") || "");
 }
 
+// Minimal line-art icons (a plain circle+rays sun, a plain crescent moon),
+// drawn with currentColor so they pick up the button's theme color. Shown
+// is the theme a click would switch TO -- moon while already in light mode.
+const SUN_ICON =
+  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/></svg>';
+const MOON_ICON =
+  '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>';
+
+function setupTheme() {
+  const root = document.documentElement;
+  const btn = document.getElementById("theme-toggle");
+  const KEY = "vizu-theme";
+
+  function sync() {
+    const theme = root.getAttribute("data-theme") === "light" ? "light" : "dark";
+    if (btn) {
+      btn.innerHTML = theme === "light" ? MOON_ICON : SUN_ICON;
+      btn.setAttribute("aria-label", theme === "light" ? "Switch to dark theme" : "Switch to light theme");
+    }
+  }
+
+  sync();
+
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
+      sync();
+      try {
+        localStorage.setItem(KEY, next);
+      } catch (e) {}
+    });
+  }
+}
+
+function setupPanelToggle() {
+  const btn = document.getElementById("panel-toggle");
+  const layout = document.getElementById("sketch-layout");
+  if (!btn || !layout) return;
+
+  function sync() {
+    const hidden = layout.classList.contains("panel-hidden");
+    btn.textContent = hidden ? "Show controls" : "Hide controls";
+    btn.setAttribute("aria-expanded", String(!hidden));
+  }
+
+  sync();
+
+  btn.addEventListener("click", () => {
+    layout.classList.toggle("panel-hidden");
+    sync();
+  });
+}
+
+// Same currentColor line-art style as the sun/moon icons above: plain
+// corner brackets pointing outward (enter) or inward (exit).
+const EXPAND_ICON =
+  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>';
+const COMPRESS_ICON =
+  '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v3a2 2 0 0 1-2 2H4M21 8h-3a2 2 0 0 1-2-2V3M3 16h3a2 2 0 0 1 2 2v3M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+
+// Fullscreens just the canvas (#sketch-holder), not the whole sketch
+// layout, so the parameter panel -- which lives in a sibling element --
+// is never part of it. The button itself lives inside #sketch-holder (see
+// article.html) rather than beside it, since the Fullscreen API hides
+// everything outside the fullscreened element -- a sibling button would be
+// unreachable the moment fullscreen starts. See the #sketch-holder:fullscreen
+// rules in style.css for how the canvas is centered and scaled once inside.
+function setupFullscreen() {
+  const btn = document.getElementById("fullscreen-toggle");
+  const holder = document.getElementById("sketch-holder");
+  if (!btn || !holder) return;
+
+  const request = holder.requestFullscreen || holder.webkitRequestFullscreen;
+  const exit = document.exitFullscreen
+    ? () => document.exitFullscreen()
+    : document.webkitExitFullscreen
+    ? () => document.webkitExitFullscreen()
+    : null;
+
+  // No Fullscreen API support (rare) -- hide the button rather than leave a
+  // control that does nothing.
+  if (!request || !exit) {
+    btn.style.display = "none";
+    return;
+  }
+
+  function current() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function sync() {
+    const active = current() === holder;
+    btn.innerHTML = active ? COMPRESS_ICON : EXPAND_ICON;
+    btn.setAttribute("aria-label", active ? "Exit fullscreen" : "View fullscreen");
+    btn.setAttribute("aria-pressed", String(active));
+  }
+
+  btn.addEventListener("click", () => {
+    if (current() === holder) {
+      exit();
+    } else {
+      // webkitRequestFullscreen (old Safari) doesn't return a promise like
+      // the standard method does, so wrap it before chaining .catch.
+      Promise.resolve(request.call(holder)).catch(() => {});
+    }
+  });
+
+  document.addEventListener("fullscreenchange", sync);
+  document.addEventListener("webkitfullscreenchange", sync);
+  sync();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   setupSearch();
   setupFilters();
+  setupTheme();
+  setupPanelToggle();
+  setupFullscreen();
 });

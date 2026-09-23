@@ -14,8 +14,20 @@
     {% endif %}
   </p>
 
-  <div id="sketch-holder"></div>
-  <div id="controls-holder" class="panel"></div>
+  <button type="button" id="panel-toggle" class="panel-toggle-btn">Hide controls</button>
+
+  <div class="sketch-layout" id="sketch-layout">
+    <div id="sketch-holder">
+      <!-- Lives inside the holder (not beside it) on purpose: the Fullscreen
+           API only keeps descendants of the fullscreened element visible,
+           so a control placed outside #sketch-holder would become
+           unclickable -- and invisible -- the moment fullscreen starts.
+           This also means only the canvas goes fullscreen, never the
+           parameter panel, which is a sibling of #sketch-holder. -->
+      <button type="button" id="fullscreen-toggle" class="fullscreen-btn" aria-label="View fullscreen" aria-pressed="false"></button>
+    </div>
+    <div id="controls-holder" class="panel"></div>
+  </div>
 
   <div class="description">
     {{ article.content }}

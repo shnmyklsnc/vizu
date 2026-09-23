@@ -6,7 +6,9 @@
 // partition it in one pass into 0s, then 1s, then 2s (the "red/white/blue"
 // flag), using low/mid/high pointers.
 
-const COLORS = {
+// Mutable (not const) so the three color pickers in buildPanel() can
+// repaint the buckets live -- drawArray() reads this fresh every frame.
+let COLORS = {
   0: [211, 47, 47], // red
   1: [235, 235, 235], // white
   2: [30, 100, 220], // blue
@@ -20,6 +22,7 @@ let stepInterval = 20;
 let arraySize = 14;
 
 let playBtn, statusEl, arrayInput;
+let theme = null; // refreshed every frame in draw() -- see themePalette() in panel.js
 
 function* partitionGen(a) {
   let low = 0;
@@ -109,9 +112,10 @@ function togglePlay() {
 function buildPanel() {
   const holder = document.getElementById("controls-holder");
 
+  panelHeading(holder, "Data");
   const row1 = panelRow(holder);
   arrayInput = panelTextInput(row1, {
-    label: "Array (0 = red, 1 = white, 2 = blue)",
+    label: "Array (0 = low, 1 = mid, 2 = high)",
     value: arr.join(","),
     maxLength: 160,
     grow: true,
@@ -131,7 +135,7 @@ function buildPanel() {
   panelSlider(row2, {
     label: "Random size",
     min: 4,
-    max: 30,
+    max: 40,
     value: arraySize,
     grow: true,
     onInput: (v) => {
@@ -140,14 +144,52 @@ function buildPanel() {
   });
   panelButton(row2, "Randomize", randomize);
 
+  panelHeading(holder, "Playback");
   const row3 = panelRow(holder);
-  playBtn = panelButton(row3, "Play", togglePlay);
-  panelButton(row3, "Step", () => {
+  panelSlider(row3, {
+    label: "Speed",
+    min: 1,
+    max: 10,
+    value: 6,
+    grow: true,
+    onInput: (v) => {
+      stepInterval = Math.round(46 - v * 4);
+    },
+  });
+
+  panelHeading(holder, "Bucket colors");
+  const row4 = panelRow(holder);
+  panelColor(row4, {
+    label: "Low (0)",
+    value: COLORS[0],
+    onChange: (rgb) => {
+      COLORS = { ...COLORS, 0: rgb };
+    },
+  });
+  panelColor(row4, {
+    label: "Mid (1)",
+    value: COLORS[1],
+    onChange: (rgb) => {
+      COLORS = { ...COLORS, 1: rgb };
+    },
+  });
+  panelColor(row4, {
+    label: "High (2)",
+    value: COLORS[2],
+    onChange: (rgb) => {
+      COLORS = { ...COLORS, 2: rgb };
+    },
+  });
+
+  const row5 = panelRow(holder);
+  row5.classList.add("buttons");
+  playBtn = panelButton(row5, "Play", togglePlay);
+  panelButton(row5, "Step", () => {
     playing = false;
     playBtn.textContent = "Play";
     stepOnce();
   });
-  panelButton(row3, "Restart", () => resetState(arr));
+  panelButton(row5, "Restart", () => resetState(arr));
 
   statusEl = panelStatusLine(holder);
 }
@@ -160,7 +202,8 @@ function setup() {
 }
 
 function draw() {
-  background(15, 15, 20);
+  theme = themePalette();
+  background(theme.canvasBg[0], theme.canvasBg[1], theme.canvasBg[2]);
 
   if (playing && frameCount % stepInterval === 0) {
     stepOnce();
@@ -194,23 +237,31 @@ function drawArray() {
     const isCompare = state.compareIdx === i;
     const isSwap = state.swapIdx === i;
 
-    stroke(isCompare || isSwap ? 255 : 40, isCompare || isSwap ? 165 : 40, isCompare || isSwap ? 0 : 46);
+    const borderColor = isCompare || isSwap ? [255, 165, 0] : theme.gridLine;
+    stroke(borderColor[0], borderColor[1], borderColor[2]);
     strokeWeight(isCompare || isSwap ? 3 : 1);
     fill(c[0], c[1], c[2]);
     rect(x, y, cell, cell, 4);
 
     noStroke();
-    fill(a[i] === 1 ? 40 : 250);
+    fill(readableTextColor(c));
     text(a[i], x, y);
 
     drawPointer(x, y + cell / 2 + 10, i, state);
   }
 
   noStroke();
-  fill(150, 150, 160);
+  fill(theme.mutedText[0], theme.mutedText[1], theme.mutedText[2]);
   textSize(11);
   textAlign(CENTER, TOP);
   text("low / mid / high shown as ▲ under the array", width / 2, y + cell / 2 + 46);
+}
+
+// The bucket colors are now user-tweakable, so pick dark or light text by
+// perceived luminance instead of assuming which bucket is the pale one.
+function readableTextColor(rgb) {
+  const luma = 0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2];
+  return luma > 150 ? 30 : 250;
 }
 
 function drawPointer(x, topY, index, state) {
