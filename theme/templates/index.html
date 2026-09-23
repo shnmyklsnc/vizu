@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid">
+  {% for article in articles %}
+  <a class="card" href="{{ SITEURL }}/{{ article.url }}">
+    <img src="{{ SITEURL }}/{{ article.thumbnail }}" alt="{{ article.title }}" loading="lazy">
+    <h3>{{ article.title }}</h3>
+    {{ article.summary }}
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

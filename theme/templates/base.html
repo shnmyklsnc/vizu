@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITENAME }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ SITESUBTITLE }}{% endblock %}">
+  <link rel="stylesheet" href="{{ SITEURL }}/extra/css/style.css">
+</head>
+<body>
+  <header>
+    <a class="site-title" href="{{ SITEURL }}/">{{ SITENAME }}</a>
+    <p class="tagline">{{ SITESUBTITLE }}</p>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    <p>Built with <a href="https://p5js.org">p5.js</a> and <a href="https://getpelican.com">Pelican</a>.</p>
+  </footer>
+</body>
+</html>

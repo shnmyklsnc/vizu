@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} · {{ SITENAME }}{% endblock %}
+{% block description %}{{ article.summary | striptags }}{% endblock %}
+{% block content %}
+<article class="sketch-page">
+  <a class="back-link" href="{{ SITEURL }}/">&larr; All sketches</a>
+  <h1>{{ article.title }}</h1>
+  <p class="meta">{{ article.locale_date }}{% if article.tags %} · {{ article.tags|join(", ") }}{% endif %}</p>
+
+  <div id="sketch-holder"></div>
+
+  <div class="description">
+    {{ article.content }}
+  </div>
+</article>
+
+<!-- p5.js from a CDN, then this sketch's own code -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="{{ SITEURL }}/{{ article.script }}"></script>
+{% endblock %}
