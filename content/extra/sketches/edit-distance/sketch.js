@@ -1,9 +1,17 @@
-// Edit Distance (Levenshtein) -- and two variations on the same underlying
-// problem, ported from the same desktop py5 project (main.py, plus the two
-// approximate-matching companions it left out of the first web pass):
+// Edit Distance (Levenshtein) -- and three variations on the same
+// underlying table, ported from the same desktop py5 project (main.py,
+// plus the two approximate-matching companions it left out of the first
+// web pass), plus Longest Common Subsequence, folded in from its own
+// former page once it became clear it fills the exact same table:
 //
 //   - "dp"          Standard DP: full O(nm) table, insert/delete/substitute
 //                    each cost 1 (solver.py).
+//   - "lcs"          Longest Common Subsequence: the SAME table shape and
+//                    fill order as "dp", just a different recurrence at
+//                    every cell (max instead of min+1), plus a highlighted
+//                    backtrace of one actual longest common subsequence
+//                    once the table is full (ported from the standalone
+//                    LCS page this replaced).
 //   - "bitparallel"  Bit-parallel (Myers 1999): full edit distance between
 //                    the SAME two words, computed via bit-vector deltas
 //                    instead of a table (bit_parallel_solver.py /
@@ -15,13 +23,14 @@
 //                    every column so a match can start anywhere in the text
 //                    (approx_match_rolling_array.py / approx_match.cpp).
 //
-// All three are switched from one "Variant" dropdown at the top of the
-// panel, per the same article -- they're the same topic, just three ways of
-// computing (or extending) the same distance.
+// All four are switched from one "Variant" dropdown at the top of the
+// panel, per the same article -- they're the same topic (or, for "lcs", a
+// close sibling that shares its table), just different ways of computing
+// (or extending) it.
 
-let variant = "dp"; // "dp" | "bitparallel" | "rolling"
+let variant = "dp"; // "dp" | "lcs" | "bitparallel" | "rolling"
 
-// --- shared with "dp" and "bitparallel" (both compare the same two words) ---
+// --- shared with "dp", "lcs" and "bitparallel" (all compare the same two words) ---
 let str1 = "House";
 let str2 = "Logarithm";
 let maxWordLen = 10;
@@ -35,6 +44,13 @@ let currentState = null;
 let cellSize = 32;
 let originX = 0;
 let originY = 0;
+
+// --- "lcs" state (same table dimensions/layout as "dp", via recomputeLayout()) ---
+let pathColor = [120, 220, 140];
+let lcsValues = [];
+let lcsPath = new Set();
+let lcsGen = null;
+let lcsState = null;
 
 // --- "bitparallel" state ---
 const BIT_ONE_COLOR = [100, 180, 100];
@@ -87,6 +103,57 @@ function* solveGen() {
 
   const finalDist = w > 0 && h > 0 ? dpValues[w * h - 1] : Math.max(w, h);
   yield { aIndex: null, bIndex: null, dpIndex: null, dist: finalDist, msg: `Done — edit (Levenshtein) distance is ${finalDist}`, done: true };
+}
+
+// Longest Common Subsequence -- same table shape and fill order as
+// solveGen() above, different recurrence at every cell: a match extends
+// the diagonal by one instead of copying it, and a mismatch carries over
+// the better (longer) of the two neighbors instead of the cheaper one.
+// Ported from the standalone LCS page's own solveGen()/backtrackPath().
+function* solveGenLCS() {
+  const w = str1.length;
+  const h = str2.length;
+  lcsValues = new Array(w * h).fill(0);
+
+  yield { aIndex: null, bIndex: null, dpIndex: null, lcsLen: -1, msg: "Solving longest common subsequence…" };
+
+  for (let j = 0; j < h; j++) {
+    for (let i = 0; i < w; i++) {
+      const idx = j * w + i;
+      if (str1[i] === str2[j]) {
+        const diag = i > 0 && j > 0 ? lcsValues[(j - 1) * w + (i - 1)] : 0;
+        lcsValues[idx] = diag + 1;
+      } else {
+        const left = i > 0 ? lcsValues[j * w + (i - 1)] : 0;
+        const top = j > 0 ? lcsValues[(j - 1) * w + i] : 0;
+        lcsValues[idx] = Math.max(left, top);
+      }
+      yield { aIndex: i, bIndex: j, dpIndex: idx, lcsLen: lcsValues[idx], msg: `Comparing '${str1[i]}' with '${str2[j]}'` };
+    }
+  }
+
+  const finalLen = w > 0 && h > 0 ? lcsValues[w * h - 1] : 0;
+  lcsPath = backtrackLcsPath(w, h);
+  yield { aIndex: null, bIndex: null, dpIndex: null, lcsLen: finalLen, msg: `Done — length of the longest common subsequence is ${finalLen}`, done: true };
+}
+
+function backtrackLcsPath(w, h) {
+  const path = new Set();
+  let i = w - 1;
+  let j = h - 1;
+  while (i >= 0 && j >= 0) {
+    if (str1[i] === str2[j]) {
+      path.add(j * w + i);
+      i--;
+      j--;
+    } else {
+      const left = i > 0 ? lcsValues[j * w + (i - 1)] : 0;
+      const top = j > 0 ? lcsValues[(j - 1) * w + i] : 0;
+      if (left >= top) i--;
+      else j--;
+    }
+  }
+  return path;
 }
 
 // Bit-parallel (Myers 1999), ported from bit_parallel_solver.py. Uses BigInt
@@ -237,6 +304,15 @@ function resetState() {
     currentState = null;
     updateStatus("Ready — press Play or Step.");
     recomputeLayout();
+  } else if (variant === "lcs") {
+    // Same static-headers-first behavior as "dp" (see the comment on that
+    // branch) -- drawLcsGrid() draws the row/column headers regardless of
+    // lcsState, so there's nothing to prime.
+    lcsGen = solveGenLCS();
+    lcsState = null;
+    lcsPath = new Set();
+    updateStatus("Ready — press Play or Step.");
+    recomputeLayout();
   } else if (variant === "bitparallel") {
     // Unlike the DP table, drawBitParallel()/drawRolling() have nothing
     // static to show (no fixed grid of headers) until a state exists, so
@@ -265,6 +341,17 @@ function stepOnce() {
       currentState = res.value;
       updateStatus(currentState.msg);
       if (currentState.done) {
+        playing = false;
+        if (playBtn) playBtn.textContent = "Play";
+      }
+    }
+  } else if (variant === "lcs") {
+    if (!lcsGen) return;
+    const res = lcsGen.next();
+    if (!res.done) {
+      lcsState = res.value;
+      updateStatus(lcsState.msg);
+      if (lcsState.done) {
         playing = false;
         if (playBtn) playBtn.textContent = "Play";
       }
@@ -328,6 +415,7 @@ function buildPanel() {
     value: variant,
     options: [
       { value: "dp", label: "Standard DP (full table)" },
+      { value: "lcs", label: "Longest Common Subsequence" },
       { value: "bitparallel", label: "Bit-parallel (Myers)" },
       { value: "rolling", label: "Rolling array (free start)" },
     ],
@@ -338,7 +426,7 @@ function buildPanel() {
     },
   });
 
-  if (variant === "dp" || variant === "bitparallel") {
+  if (variant === "dp" || variant === "lcs" || variant === "bitparallel") {
     panelHeading(holder, "Data");
     const row1 = panelRow(holder);
     inputA = panelTextInput(row1, {
@@ -453,6 +541,15 @@ function buildPanel() {
       },
     });
   }
+  if (variant === "lcs") {
+    panelColor(row4, {
+      label: "Path color",
+      value: pathColor,
+      onChange: (rgb) => {
+        pathColor = rgb;
+      },
+    });
+  }
 
   const row5 = panelRow(holder);
   row5.classList.add("buttons");
@@ -490,6 +587,8 @@ function draw() {
 
   if (variant === "dp") {
     drawGrid();
+  } else if (variant === "lcs") {
+    drawLcsGrid();
   } else if (variant === "bitparallel") {
     drawBitParallel();
   } else {
@@ -521,7 +620,41 @@ function drawGrid() {
       const filled = currentState && (currentState.dpIndex >= idx || currentState.done);
       const label = filled ? dpValues[idx] : "";
       const isCurrent = currentState && currentState.dpIndex === idx && !currentState.done;
-      drawCell(i + 1, j + 1, label, isCurrent);
+      drawCell(i + 1, j + 1, label, isCurrent, false);
+    }
+  }
+}
+
+// Longest Common Subsequence -- identical structure to drawGrid() above
+// (same headers, same fill-order reveal), reading from lcsValues/lcsState
+// instead of dpValues/currentState, plus a highlighted backtrace path once
+// the table is done (ported from the standalone LCS page's drawGrid()).
+function drawLcsGrid() {
+  const w = str1.length;
+  const h = str2.length;
+
+  rectMode(CENTER);
+  textAlign(CENTER, CENTER);
+  textSize(cellSize * 0.42);
+
+  drawCell(0, 0, "·", false, false);
+
+  for (let i = 0; i < w; i++) {
+    drawCell(i + 1, 0, str1[i], lcsState && lcsState.aIndex === i, false);
+  }
+
+  for (let j = 0; j < h; j++) {
+    drawCell(0, j + 1, str2[j], lcsState && lcsState.bIndex === j, false);
+  }
+
+  for (let j = 0; j < h; j++) {
+    for (let i = 0; i < w; i++) {
+      const idx = j * w + i;
+      const filled = lcsState && (lcsState.dpIndex >= idx || lcsState.done);
+      const label = filled ? lcsValues[idx] : "";
+      const isCurrent = lcsState && lcsState.dpIndex === idx && !lcsState.done;
+      const onPath = lcsState && lcsState.done && lcsPath.has(idx);
+      drawCell(i + 1, j + 1, label, isCurrent, onPath);
     }
   }
 }
@@ -533,11 +666,15 @@ function readableTextColor(rgb) {
   return luma > 150 ? 30 : 250;
 }
 
-function drawCell(col, row, label, highlighted) {
+function drawCell(col, row, label, highlighted, onPath) {
   const x = originX + col * cellSize;
   const y = originY + row * cellSize;
 
-  if (highlighted) {
+  if (onPath) {
+    stroke(pathColor[0], pathColor[1], pathColor[2]);
+    strokeWeight(3);
+    fill(pathColor[0] * 0.25, pathColor[1] * 0.25, pathColor[2] * 0.25);
+  } else if (highlighted) {
     stroke(highlightColor[0], highlightColor[1], highlightColor[2]);
     strokeWeight(3);
     fill(highlightColor[0], highlightColor[1], highlightColor[2]);
@@ -549,7 +686,9 @@ function drawCell(col, row, label, highlighted) {
   rect(x, y, cellSize, cellSize, 3);
 
   noStroke();
-  if (highlighted) {
+  if (onPath) {
+    fill(theme.text[0], theme.text[1], theme.text[2]);
+  } else if (highlighted) {
     fill(readableTextColor(highlightColor));
   } else {
     fill(theme.text[0], theme.text[1], theme.text[2]);

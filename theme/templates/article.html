@@ -14,6 +14,7 @@
     {% endif %}
   </p>
 
+  {% if article.layout != "freeform" %}
   <button type="button" id="panel-toggle" class="panel-toggle-btn">Hide controls</button>
 
   <div class="sketch-layout" id="sketch-layout">
@@ -28,14 +29,33 @@
     </div>
     <div id="controls-holder" class="panel"></div>
   </div>
+  {% endif %}
 
-  <div class="description">
+  <div class="{% if article.layout == 'freeform' %}article-body{% else %}description{% endif %}">
     {{ article.content }}
   </div>
 </article>
 
-<!-- p5.js from a CDN, then the shared control-panel helper, then this sketch's own code -->
+<!-- Every freeform article gets the shared page-tabs controller (Learn /
+     Recurrence / Try it, or whatever it calls its sections) -- one script,
+     loaded once here, instead of a copy pasted into each article's own
+     walkthroughs.js. -->
+{% if article.layout == "freeform" %}
+<script src="{{ SITEURL }}/extra/js/page-tabs.js"></script>
+<script src="{{ SITEURL }}/extra/js/stepper.js"></script>
+{% endif %}
+
+<!-- "Classic" articles get the canvas auto-rendered above (see the
+     layout check above) and always load their sketch script. "Freeform"
+     articles (article.layout: freeform in front matter) place their own
+     copy of the sketch-layout markup inline wherever they want it in the
+     write-up -- but if they embed a simulation at all, they still need
+     these same three scripts, so we still load them whenever the article
+     declares a Script, regardless of layout. Articles with no simulation
+     at all (no Script) skip this entirely. -->
+{% if article.script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 <script src="{{ SITEURL }}/extra/js/panel.js"></script>
 <script src="{{ SITEURL }}/{{ article.script }}"></script>
+{% endif %}
 {% endblock %}

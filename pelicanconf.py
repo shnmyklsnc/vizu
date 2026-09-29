@@ -2,7 +2,7 @@ import json
 
 AUTHOR = "Shan"
 SITENAME = "Vizu"
-SITESUBTITLE = "A gallery of generative animations and visualizations"
+SITESUBTITLE = "Interactive companion for CMSC 244"
 SITEURL = ""
 
 PATH = "content"

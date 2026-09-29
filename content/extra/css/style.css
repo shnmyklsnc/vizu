@@ -1,26 +1,59 @@
+/* Design tokens: an editorial palette (Newsreader for headings/equations,
+   Public Sans for everything else) shared by every page, plus a set of
+   algorithm-semantic colors (less/greater/pivot/med) that step-by-step
+   walkthroughs use to color cells, tree nodes, and badges consistently
+   site-wide. --accent is UP's own maroon (#7B1113, the university's
+   official color) and stays reserved for ordinary site chrome (links,
+   pills, focus rings, the byline/complexity components) so the semantic
+   colors keep reading as *algorithm* meaning, not just "the site's link
+   color" reused. True UP Maroon only reaches ~1.7:1 contrast against this
+   dark background (it's tuned for print/white, not near-black UI), so the
+   dark theme uses a brightened, still-clearly-maroon tint (#e2647a,
+   ~5.5:1 contrast) instead -- the light theme below uses the real thing. */
 :root {
-  --bg: #0b0b0f;
-  --fg: #eaeaea;
-  --muted: #9a9aa5;
-  --card-bg: #16161d;
-  --accent: #7dd3fc;
-  --border: #2a2a33;
-  --divider: #202027;
+  --bg: #0f171b;
+  --fg: #e6edf0;
+  --muted: #93a3ac;
+  --card-bg: #16222a;
+  --border: #2a3a44;
+  --divider: #2a3a44;
+  --accent: #e2647a;
+
+  --less: #4fc3cc;
+  --greater: #c58be0;
+  --pivot: #ff6b72;
+  --med: #f0b84a;
+  --less-bg: rgba(79, 195, 204, .18);
+  --greater-bg: rgba(197, 139, 224, .18);
+  --med-bg: rgba(240, 184, 74, .22);
+  --pivot-bg: rgba(255, 107, 114, .2);
+  --unk-bg: rgba(147, 163, 172, .1);
   color-scheme: dark;
 }
 
 /* Light theme, toggled via the header button (see .theme-toggle / nav.js).
    The sketch canvases themselves stay dark regardless -- they're a fixed
    "stage" for the animation, tuned against a dark backdrop -- but every bit
-   of surrounding site chrome (nav, cards, panel, footer) follows this. */
+   of surrounding site chrome (nav, cards, panel, footer, walkthroughs)
+   follows this. */
 :root[data-theme="light"] {
-  --bg: #f3f3f6;
-  --fg: #1b1b20;
-  --muted: #5b5b66;
+  --bg: #f5f7f8;
+  --fg: #18262e;
+  --muted: #586872;
   --card-bg: #ffffff;
-  --accent: #0f7fb8;
-  --border: #dcdce3;
-  --divider: #ececf1;
+  --border: #d6dde1;
+  --divider: #d6dde1;
+  --accent: #7B1113;
+
+  --less: #0d7480;
+  --greater: #7b3a94;
+  --pivot: #c1272d;
+  --med: #b9800f;
+  --less-bg: rgba(13, 116, 128, .15);
+  --greater-bg: rgba(123, 58, 148, .15);
+  --med-bg: rgba(185, 128, 15, .22);
+  --pivot-bg: rgba(193, 39, 45, .16);
+  --unk-bg: rgba(88, 104, 114, .09);
   color-scheme: light;
 }
 
@@ -30,9 +63,15 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.55;
   transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+h1, h2, h3 {
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 header {
@@ -41,8 +80,9 @@ header {
 }
 
 .site-title {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.85rem;
+  font-weight: 600;
   color: var(--fg);
   text-decoration: none;
 }
@@ -432,6 +472,217 @@ main {
   color: var(--muted);
 }
 
+/* "Freeform" articles (see article.html's {% if article.layout ==
+   "freeform" %}) own their whole content area instead of getting a short
+   muted blurb under an auto-placed canvas -- full-contrast text, roomier
+   width, for the walkthrough/equation-heavy write-ups this powers. */
+.article-body {
+  max-width: 900px;
+  color: var(--fg);
+}
+
+.article-body p {
+  margin: 0 0 12px;
+  max-width: 68ch;
+}
+
+.article-body .lede {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
+.article-body h2 {
+  font-size: 1.55rem;
+  margin: 52px 0 10px;
+}
+
+.article-body h2:first-of-type {
+  margin-top: 28px;
+}
+
+.article-body h3 {
+  font-size: 1.15rem;
+  margin: 0 0 6px;
+}
+
+.article-body h4 {
+  font-family: "Public Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Inline variable/notation styling -- a plain code chip, so a bare `n`,
+   `T(n)`, or `O(n log n)` mentioned mid-sentence is easy to spot without
+   reading every word, the same way backticked text reads in Markdown. Kept
+   deliberately neutral (card surface, not an accent color) so it doesn't
+   compete with the .eq display-equation blocks, which are their own,
+   larger, Newsreader-set thing. */
+.article-body code {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  font-size: 0.88em;
+  padding: 0.1em 0.4em;
+  border-radius: 5px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  white-space: nowrap;
+}
+
+/* --- "devised by" attribution card, replacing a generic lede --- */
+
+.article-body .byline {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 16px 20px;
+  margin: 20px 0 16px;
+  background: var(--card-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+}
+
+.article-body .byline-who {
+  flex: 0 0 auto;
+  min-width: 150px;
+}
+
+.article-body .byline-eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.article-body .byline-name {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.article-body .byline-meta {
+  flex: 1 1 320px;
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 60ch;
+}
+
+.article-body .byline-meta cite {
+  font-style: italic;
+  color: var(--fg);
+}
+
+/* --- complexity summary strip --- */
+
+.article-body .complexity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 28px;
+}
+
+.article-body .cx-item {
+  flex: 1 1 130px;
+  padding: 10px 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.article-body .cx-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.article-body .cx-value {
+  display: block;
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+/* --- page-level section tabs (Partitioning / Choosing the pivot /
+   Proving it's O(n) / Simulate it yourself) -- the article's own top-level
+   navigation, one big topic at a time instead of one long scroll. Visually
+   a segmented control (boxed, evenly-weighted buttons) rather than the
+   underlined .steps used for a widget's internal sequence, so the two
+   levels of navigation never read as the same kind of control. */
+
+.article-body .page-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 20px 0 8px;
+  padding: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.article-body .page-tabs button {
+  flex: 1 1 160px;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.6rem 0.9rem;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.article-body .page-tabs button:hover {
+  color: var(--fg);
+}
+
+.article-body .page-tabs button[aria-selected="true"] {
+  background: var(--bg);
+  color: var(--fg);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.article-body .page-tabs button:focus-visible {
+  outline: 2px solid var(--pivot);
+  outline-offset: 2px;
+}
+
+.article-body .tab-panel[hidden] {
+  display: none;
+}
+
+.article-body .tab-panel > h2:first-child {
+  margin-top: 28px;
+}
+
+@media (max-width: 560px) {
+  .article-body .page-tabs button {
+    flex: 1 1 45%;
+    font-size: 0.88rem;
+    padding: 0.55rem 0.6rem;
+  }
+}
+
 /* --- tweak panel (sample-value controls under a sketch) --- */
 
 .panel {
@@ -660,4 +911,388 @@ footer {
 
 footer a {
   color: var(--accent);
+}
+
+/* ==========================================================================
+   Step-by-step walkthroughs (freeform articles only -- see .article-body
+   above). Every selector here is scoped under .article-body so it can
+   never leak onto the gallery grid, the old p5 tweak-panel, or site chrome,
+   even where a name (like .row or .badge) might otherwise be generic
+   enough to collide with something added later.
+   ========================================================================== */
+
+.article-body .wpanel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 16px 0 28px;
+}
+
+.article-body .controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  margin: 0 0 14px;
+}
+
+.article-body .btn {
+  font: inherit;
+  font-size: 0.92rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.article-body .btn:hover:not(:disabled) {
+  border-color: var(--fg);
+}
+
+.article-body .btn.primary {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.article-body .btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.article-body .btn[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.article-body :is(.btn, input[type="range"]):focus-visible {
+  outline: 2px solid var(--pivot);
+  outline-offset: 2px;
+}
+
+.article-body .seg {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.article-body .seg .lbl {
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin-right: 2px;
+}
+
+.article-body .krow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.92rem;
+}
+
+.article-body .krow input {
+  width: 150px;
+  accent-color: var(--pivot);
+}
+
+.article-body .krow output {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 1.6em;
+}
+
+.article-body .steps {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 2px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: thin;
+}
+
+.article-body .steps::-webkit-scrollbar {
+  height: 4px;
+}
+
+.article-body .steps::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+.article-body .steps button {
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  padding: 0.55rem 0.85rem 0.6rem;
+  margin-bottom: -1px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.article-body .steps button:hover {
+  color: var(--fg);
+  border-color: var(--border);
+}
+
+.article-body .steps button[aria-current="step"] {
+  color: var(--fg);
+  font-weight: 600;
+  border-color: var(--accent);
+}
+
+.article-body .steps button:focus-visible {
+  outline: 2px solid var(--pivot);
+  outline-offset: -2px;
+}
+
+.article-body .caption {
+  min-height: 5.6em;
+  margin-bottom: 14px;
+}
+
+.article-body .caption p {
+  margin: 0 0 8px;
+}
+
+.article-body .caption h3 {
+  margin-bottom: 6px;
+}
+
+.article-body .stage {
+  overflow-x: auto;
+  padding: 4px 2px 10px;
+}
+
+.article-body .cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card-bg);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+}
+
+.article-body .cell.med { background: var(--med-bg); border-color: var(--med); font-weight: 600; }
+.article-body .cell.piv { background: var(--pivot-bg); border-color: var(--pivot); color: var(--pivot); font-weight: 700; }
+.article-body .cell.lo { background: var(--less-bg); border-color: var(--less); }
+.article-body .cell.hi { background: var(--greater-bg); border-color: var(--greater); }
+.article-body .cell.unk { background: var(--unk-bg); color: var(--muted); }
+.article-body .cell.dim { opacity: 0.28; }
+
+.article-body .flat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.article-body .cols {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.article-body .col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.article-body .col .cap {
+  font-size: 0.78rem;
+  color: var(--muted);
+  height: 1.3em;
+  white-space: nowrap;
+}
+
+.article-body .row {
+  margin: 0 0 14px;
+}
+
+.article-body .rowcap {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.article-body .strip {
+  margin-bottom: 16px;
+}
+
+.article-body .strip .flat {
+  margin-top: 0;
+}
+
+.article-body .badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.article-body .badge {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.article-body .badge.lo { background: var(--less-bg); border-color: var(--less); }
+.article-body .badge.hi { background: var(--greater-bg); border-color: var(--greater); }
+
+.article-body .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.article-body .legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.article-body .sw {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  display: inline-block;
+}
+
+.article-body .sw.med { background: var(--med-bg); border-color: var(--med); }
+.article-body .sw.piv { background: var(--pivot-bg); border-color: var(--pivot); }
+.article-body .sw.lo { background: var(--less-bg); border-color: var(--less); }
+.article-body .sw.hi { background: var(--greater-bg); border-color: var(--greater); }
+.article-body .sw.unk { background: var(--unk-bg); }
+
+.article-body .scroll {
+  overflow-x: auto;
+}
+
+.article-body .scroll svg {
+  display: block;
+  min-width: 700px;
+  width: 100%;
+  height: auto;
+}
+
+.article-body .edge { stroke-width: 1.5; fill: none; }
+.article-body .edge.med { stroke: var(--med); }
+.article-body .edge.kept { stroke: var(--greater); }
+.article-body .node { stroke-width: 1.4; }
+.article-body .node.root { fill: var(--card-bg); stroke: var(--fg); }
+.article-body .node.med { fill: var(--med-bg); stroke: var(--med); }
+.article-body .node.kept { fill: var(--greater-bg); stroke: var(--greater); }
+.article-body .node-t { font: 600 12px "Public Sans", sans-serif; fill: var(--fg); }
+.article-body .lvl-t { font: 12px "Public Sans", sans-serif; fill: var(--muted); }
+.article-body .costbar { fill: var(--pivot); opacity: 0.72; }
+.article-body .cost-t { font: 12px "Public Sans", sans-serif; fill: var(--muted); }
+.article-body .svg-h { font: 600 12px "Public Sans", sans-serif; fill: var(--muted); }
+
+/* A plain, symmetric recursion tree (both children are equally-sized
+   subproblems, unlike median-of-medians' med/kept split), so it only
+   needs one extra node/edge color instead of two. */
+.article-body .node.half { fill: var(--less-bg); stroke: var(--less); }
+.article-body .edge.half { stroke: var(--less); }
+
+/* --- #cp-plot-style: the closest-pair scatter widget --- */
+
+.article-body .cp-plot {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  margin: 4px 0;
+}
+.article-body .cp-plot .cp-band { fill: var(--unk-bg); }
+.article-body .cp-plot .cp-split { stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.article-body .cp-plot .cp-line { stroke-width: 2; fill: none; }
+.article-body .cp-plot .cp-line.lo { stroke: var(--less); }
+.article-body .cp-plot .cp-line.hi { stroke: var(--greater); }
+.article-body .cp-plot .cp-line.piv { stroke: var(--pivot); }
+.article-body .cp-plot .cp-line.dim { stroke: var(--muted); stroke-dasharray: 3 3; opacity: 0.6; }
+.article-body .cp-plot .cp-pt { stroke: var(--border); stroke-width: 1; }
+.article-body .cp-plot .cp-pt.lo { fill: var(--less); }
+.article-body .cp-plot .cp-pt.hi { fill: var(--greater); }
+.article-body .cp-plot .cp-pt.med { fill: var(--med); }
+.article-body .cp-plot .cp-pt.piv { fill: var(--pivot); }
+.article-body .cp-plot .cp-pt.unk { fill: var(--muted); opacity: 0.55; }
+
+.article-body .enter { animation: article-fadein 0.55s ease-out both; }
+@keyframes article-fadein {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .article-body .enter { animation: none; }
+}
+
+.article-body .readout { margin-top: 14px; }
+
+.article-body .eq {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.9;
+  border-left: 3px solid var(--border);
+  padding: 4px 0 4px 16px;
+  margin: 10px 0 16px;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.article-body .eq b { font-weight: 600; }
+
+.article-body .foot {
+  margin-top: 40px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  max-width: 68ch;
+}
+
+/* The embedded p5 simulation, when a freeform article places one inline
+   (see the "Simulate it yourself" pattern) -- same sketch-layout/panel
+   markup as a classic article, just no longer auto-rendered by the
+   template, so it needs its own spacing here. Unlike a classic article
+   (which is free to wrap the panel below the canvas if the canvas is
+   wide), the Try it tab forces canvas and panel to stay side by side --
+   letting the canvas shrink to make room, rather than letting the pair
+   wrap into a stack -- since it never has to share the page with a
+   sidebar the way a classic sketch page's canvas does. Genuinely narrow
+   (mobile) viewports still fall back to a column: see the
+   max-width: 980px rule above, which isn't scoped to .article-body. */
+.article-body .sketch-layout {
+  margin: 16px 0 20px;
+  flex-wrap: nowrap;
+}
+
+.article-body .sketch-layout #sketch-holder {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .article-body .cell { width: 38px; height: 32px; font-size: 0.9rem; }
+  .article-body .cols { gap: 6px; }
 }
