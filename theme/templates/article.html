@@ -54,8 +54,13 @@
      declares a Script, regardless of layout. Articles with no simulation
      at all (no Script) skip this entirely. -->
 {% if article.script %}
+{# "Runtime: vanilla" in front matter marks a simulation that does not use p5
+   (e.g. sleeping-barber, which mounts its own UI), so skip p5.js and the p5
+   parameter panel and load just its script. #}
+{% if article.runtime != "vanilla" %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 <script src="{{ SITEURL }}/extra/js/panel.js"></script>
+{% endif %}
 <script src="{{ SITEURL }}/{{ article.script }}"></script>
 {% endif %}
 {% endblock %}

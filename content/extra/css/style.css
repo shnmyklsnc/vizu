@@ -1296,3 +1296,44 @@ footer a {
   .article-body .cell { width: 38px; height: 32px; font-size: 0.9rem; }
   .article-body .cols { gap: 6px; }
 }
+
+/* --- code listings and "check your answer" disclosures (freeform articles) ---
+   pre.code-block is for pseudocode and source files; it deliberately has no
+   <code> child, because inline `code` above is a bordered nowrap chip. */
+.article-body pre.code-block {
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 10px 0 18px;
+  overflow-x: auto;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.article-body details.answer {
+  margin: 6px 0 14px;
+  max-width: 68ch;
+}
+
+.article-body details.answer > summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.article-body details.answer[open] > summary {
+  margin-bottom: 6px;
+}
+
+.article-body ol.predict {
+  padding-left: 1.3rem;
+  max-width: 68ch;
+}
+
+.article-body ol.predict > li {
+  margin-bottom: 14px;
+}

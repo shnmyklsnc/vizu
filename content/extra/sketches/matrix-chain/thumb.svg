@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+  <rect width="600" height="400" fill="#0f0f14"/>
+
+  <!-- four matrices in a chain -->
+  <g font-family="sans-serif" font-size="14" text-anchor="middle">
+    <rect x="90"  y="150" width="60" height="60" fill="#5a8cdc"/>
+    <text x="120" y="230" fill="#9d9da8">A1</text>
+    <rect x="180" y="160" width="60" height="40" fill="#c58be0"/>
+    <text x="210" y="230" fill="#9d9da8">A2</text>
+    <rect x="270" y="145" width="60" height="70" fill="#5ac37a"/>
+    <text x="300" y="230" fill="#9d9da8">A3</text>
+    <rect x="360" y="165" width="60" height="30" fill="#ffd246"/>
+    <text x="390" y="230" fill="#9d9da8">A4</text>
+  </g>
+
+  <!-- costlier grouping, struck through -->
+  <g stroke="#6d6d78" stroke-width="2" fill="none">
+    <path d="M90 110 L 90 100 L 240 100 L 240 110"/>
+    <path d="M120 90 L 120 80 L 210 80 L 210 90"/>
+    <path d="M270 110 L 270 100 L 420 100 L 420 110"/>
+  </g>
+  <line x1="70" y1="72" x2="440" y2="108" stroke="#e05a5a" stroke-width="2.5"/>
+  <text x="460" y="95" fill="#6d6d78" font-family="sans-serif" font-size="13">costly order</text>
+
+  <!-- cheaper grouping, highlighted -->
+  <g stroke="#ffd246" stroke-width="2.5" fill="none">
+    <path d="M90 260 L 90 270 L 150 270 L 150 260"/>
+    <path d="M180 260 L 180 285 L 330 285 L 330 260"/>
+    <path d="M120 270 L 120 300 L 255 300 L 255 285"/>
+  </g>
+  <text x="460" y="270" fill="#ffd246" font-family="sans-serif" font-size="13" font-weight="bold">cheapest order</text>
+
+  <text x="300" y="345" fill="#5ac37a" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle">O(n&#179;) DP</text>
+  <text x="300" y="372" fill="#6d6d78" font-family="sans-serif" font-size="15" text-anchor="middle">same matrices, parentheses change the cost</text>
+</svg>

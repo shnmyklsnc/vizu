@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+  <rect width="600" height="400" fill="#0f0f14"/>
+
+  <!-- naive recursion: a small exploding tree, top half -->
+  <g stroke="#4a4a54" stroke-width="1.5" fill="none">
+    <line x1="150" y1="60"  x2="90"  y2="105"/>
+    <line x1="150" y1="60"  x2="210" y2="105"/>
+    <line x1="90"  y1="105" x2="55"  y2="150"/>
+    <line x1="90"  y1="105" x2="125" y2="150"/>
+    <line x1="210" y1="105" x2="175" y2="150"/>
+    <line x1="210" y1="105" x2="245" y2="150"/>
+    <line x1="55"  y1="150" x2="35"  y2="190"/>
+    <line x1="55"  y1="150" x2="70"  y2="190"/>
+    <line x1="125" y1="150" x2="105" y2="190"/>
+    <line x1="125" y1="150" x2="140" y2="190"/>
+    <line x1="175" y1="150" x2="155" y2="190"/>
+    <line x1="175" y1="150" x2="190" y2="190"/>
+  </g>
+  <circle cx="150" cy="60" r="9" fill="#ffa500"/>
+  <circle cx="90" cy="105" r="7" fill="#c58be0"/>
+  <circle cx="210" cy="105" r="7" fill="#c58be0"/>
+  <circle cx="55" cy="150" r="6" fill="#5ac8dc"/>
+  <circle cx="125" cy="150" r="6" fill="#5ac8dc"/>
+  <circle cx="175" cy="150" r="6" fill="#5ac8dc"/>
+  <circle cx="245" cy="150" r="5" fill="#ffd246"/>
+  <circle cx="35" cy="190" r="4" fill="#ffd246"/>
+  <circle cx="70" cy="190" r="4" fill="#ffd246"/>
+  <circle cx="105" cy="190" r="4" fill="#ffd246"/>
+  <circle cx="140" cy="190" r="4" fill="#ffd246"/>
+  <circle cx="155" cy="190" r="4" fill="#ffd246"/>
+  <circle cx="190" cy="190" r="4" fill="#ffd246"/>
+  <text x="150" y="222" fill="#9d9da8" font-family="sans-serif" font-size="14" text-anchor="middle">naive recursion</text>
+
+  <!-- bottom-up: a flat filled row, right half -->
+  <g>
+    <rect x="380" y="90"  width="38" height="38" fill="#5ac37a"/>
+    <rect x="422" y="90"  width="38" height="38" fill="#5ac37a"/>
+    <rect x="464" y="90"  width="38" height="38" fill="#5ac37a"/>
+    <rect x="506" y="90"  width="38" height="38" fill="#5ac37a"/>
+    <rect x="548" y="90"  width="38" height="38" fill="#4ab36a"/>
+  </g>
+  <text x="463" y="76" fill="#9d9da8" font-family="sans-serif" font-size="13" text-anchor="middle">F[0]  F[1]  F[2]  F[3]  F[4]</text>
+  <text x="463" y="152" fill="#9d9da8" font-family="sans-serif" font-size="14" text-anchor="middle">bottom-up</text>
+
+  <text x="300" y="290" fill="#ffd246" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle">&#966;<tspan font-size="16">n</tspan> vs n</text>
+  <text x="300" y="325" fill="#6d6d78" font-family="sans-serif" font-size="16" text-anchor="middle">same recurrence, one recomputes everything</text>
+</svg>

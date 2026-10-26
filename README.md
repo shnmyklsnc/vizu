@@ -75,6 +75,16 @@ For a one-off build without the dev server: `pelican content -o output`.
 GitHub Actions rebuilds and redeploys automatically. It shows up on the
 homepage sorted by date, same as before.
 
+### Simulations that don't use p5
+
+A page can ship its own UI instead of a p5 sketch -- `sleeping-barber` is the
+example. Add `Runtime: vanilla` to the front matter and the article template
+skips p5.js and the p5 parameter panel, loading only the file named in
+`Script:`. In that article, `sketch.js` mounts a shadow root into a
+`<div id="sbs-host">` in the markdown (so its CSS can't clash with the site's)
+and loads `engine.js` (pure logic, also runnable under node) and
+`simulator.css` from the same folder.
+
 ## Deploying to GitHub Pages
 
 Unlike Jekyll, GitHub Pages does not build Pelican sites natively, so this
